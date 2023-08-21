@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=0.5">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Teste</title>
+        
+
+    <body>
+        <h1>Mensagenss em tempo real</h1>
+        <p> {{ .title }} </p>
+        <div id="messages">
+        </div>
+        <script > 
+            const eventSource = new EventSource("{{ .url }}");
+            /* event.onmessage = function(event) {
+                const messages = document.querySelector(".messages");
+                const newMessage = document.createElement("p");
+                newMessage.innerText = event.data;
+                messages.appendChild(newMessage);
+            } */ 
+            eventSource.addEventListener('message', (event) => {
+                const message = document.getElementById("messages");
+                message.innerHTML = event.data ;
+                consol.log(event);
+            })
+        </script>
+    </body>
+</html>
