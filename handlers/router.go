@@ -26,7 +26,7 @@ func initializeRoutes(router *gin.Engine) {
 	v1 := router.Group(basePath)
 	{
 		// Opening routes
-		v1.GET("/", )
+		v1.GET("/", CreateRooms)
 
 		v1.GET("/clients", GetClients)
 
