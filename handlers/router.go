@@ -1,13 +1,20 @@
 package handlers
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	swagfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag/example/basic/docs"
 	"nhooyr.io/websocket"
+)
+
+type session struct {
+	conn *websocket.Conn
+	room string
+}
+
+var (
+	rooms map[string]map[*session]bool = make(map[string]map[*session]bool)
 )
 
 func initializeRoutes(router *gin.Engine) {
@@ -19,37 +26,13 @@ func initializeRoutes(router *gin.Engine) {
 	v1 := router.Group(basePath)
 	{
 		// Opening routes
-		v1.GET("/", func(c *gin.Context) {
-			c.JSON(200, gin.H{"message": "hello"})
-		})
+		v1.GET("/", )
 
-		v1.GET("/ws", func(c *gin.Context) {
-			// c.Header("Content-Type", "text/event-stream")
-			// c.Header("Cache-Control", "no-cache")
-			// c.Header("Connection", "keep-alive")
+		v1.GET("/clients", GetClients)
 
-			conn, err := websocket.Accept(c.Writer, c.Request, &websocket.AcceptOptions{
-				InsecureSkipVerify: true,
-			})
+		v1.GET("/rooms", GetRooms )
 
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			for {
-				_, msg, err := conn.Read(c)
-				if err != nil {
-					log.Println(err)
-					break
-				}
-				if string(msg) == "ola" {
-					conn.Write(c, websocket.MessageText, []byte("hi"))
-				} else {
-					conn.Write(c, websocket.MessageText, []byte(string(msg)))
-				}
-				log.Println(string(msg))
-			}
-		})
+		v1.GET("/ws/:room_id", ConnectRoom)
 	}
 	// Init Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swagfiles.Handler))
