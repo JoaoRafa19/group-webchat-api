@@ -35,7 +35,7 @@ func ConnectRoom(c *gin.Context) {
 	connections := rooms[roomId]
 	if connections == nil {
 		conn.Write(c, websocket.MessageText, []byte("room not found make shure you have created this room"))
-		conn.Close(websocket.CloseStatus(nil), "Connection closed")
+		conn.Close(websocket.StatusTryAgainLater, "Connection closed")
 		log.Println("Connection not found")
 		return
 	}
