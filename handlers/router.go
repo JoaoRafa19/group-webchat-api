@@ -20,7 +20,6 @@ var (
 func initializeRoutes(router *gin.Engine) {
 	//Initialize handler
 	basePath := "/"
-	router.LoadHTMLGlob("templates/*")
 	docs.SwaggerInfo.BasePath = basePath
 
 	v1 := router.Group(basePath)
@@ -30,7 +29,7 @@ func initializeRoutes(router *gin.Engine) {
 
 		v1.GET("/clients", GetClients)
 
-		v1.GET("/rooms", GetRooms )
+		v1.GET("/rooms", GetRooms)
 
 		v1.GET("/ws/:room_id", ConnectRoom)
 	}
