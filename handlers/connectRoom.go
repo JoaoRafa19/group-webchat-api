@@ -10,6 +10,8 @@ import (
 )
 
 func ConnectRoom(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	roomId := c.Param("room_id")
 
@@ -22,11 +24,12 @@ func ConnectRoom(c *gin.Context) {
 	})
 
 	if err != nil {
-		conn.Close(websocket.CloseStatus(err), "Connection closed")
+		conn.Close(websocket.CloseStatus(err), "Connection closed by server")
 		log.Println(err)
 		return
 	}
-	defer conn.Close(websocket.CloseStatus(nil), "Connection closed")
+	
+
 	//database.Insert("websocket", conn)
 
 	// um cliente conectou com o websocket
@@ -35,11 +38,23 @@ func ConnectRoom(c *gin.Context) {
 	connections := rooms[roomId]
 	if connections == nil {
 		conn.Write(c, websocket.MessageText, []byte("room not found make shure you have created this room"))
-		conn.Close(websocket.StatusTryAgainLater, "Connection closed")
+		conn.Close(websocket.StatusTryAgainLater, "Connection closed by server")
 		log.Println("Connection not found")
 		return
 	}
 	connections[ses] = true
+	defer func() {
+		err := conn.Close(websocket.CloseStatus(nil), "Connection closed by client")
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println("Connection closed")
+		delete(rooms[roomId], ses)
+		if len(rooms[roomId]) == 0 {
+			delete(rooms, roomId)
+			log.Println("Room deleted")
+		}
+	}()
 	for {
 		_, msg, err := conn.Read(c)
 		if err != nil {

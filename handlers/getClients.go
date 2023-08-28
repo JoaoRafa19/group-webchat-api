@@ -8,6 +8,8 @@ import (
 )
 
 func GetClients(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	clients, err := database.Get("websocket")
 

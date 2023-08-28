@@ -8,6 +8,8 @@ import (
 )
 
 func CreateRooms(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	roomId := uuid.New().String()
 	connections := rooms[roomId]
