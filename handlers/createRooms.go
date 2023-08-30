@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/JoaoRafa19/goplaningbackend/session"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -14,7 +15,7 @@ func CreateRooms(c *gin.Context) {
 	roomId := uuid.New().String()
 	connections := rooms[roomId]
 	if connections == nil {
-		connections = make(map[*session]bool)
+		connections = make(map[*session.Manager]bool)
 	}
 	rooms[roomId] = connections
 

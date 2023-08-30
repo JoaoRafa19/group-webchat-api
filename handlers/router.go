@@ -1,20 +1,15 @@
 package handlers
 
 import (
+	"github.com/JoaoRafa19/goplaningbackend/session"
 	"github.com/gin-gonic/gin"
 	swagfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag/example/basic/docs"
-	"nhooyr.io/websocket"
 )
 
-type session struct {
-	conn *websocket.Conn
-	room string
-}
-
 var (
-	rooms map[string]map[*session]bool = make(map[string]map[*session]bool)
+	rooms map[string]map[*session.Manager]bool = make(map[string]map[*session.Manager]bool)
 )
 
 func initializeRoutes(router *gin.Engine) {

@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
-	"strings"
 
+	"github.com/JoaoRafa19/goplaningbackend/session"
 	"github.com/gin-gonic/gin"
-	"nhooyr.io/websocket"
 )
 
 func ConnectRoom(c *gin.Context) {
@@ -19,58 +17,47 @@ func ConnectRoom(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "room_id must be passed"})
 	}
 
-	conn, err := websocket.Accept(c.Writer, c.Request, &websocket.AcceptOptions{
-		InsecureSkipVerify: true,
-	})
+	manager := session.CreateManager(roomId)
 
-	if err != nil {
-		conn.Close(websocket.CloseStatus(err), "Connection closed by server")
-		log.Println(err)
-		return
-	}
-	
+	manager.ServeWS(c.Writer, c.Request)
 
-	//database.Insert("websocket", conn)
-
-	// um cliente conectou com o websocket
-	// clients[conn] = true
-	ses := &session{conn: conn, room: roomId}
-	connections := rooms[roomId]
-	if connections == nil {
-		conn.Write(c, websocket.MessageText, []byte("room not found make shure you have created this room"))
-		conn.Close(websocket.StatusTryAgainLater, "Connection closed by server")
-		log.Println("Connection not found")
-		return
-	}
-	connections[ses] = true
-	defer func() {
-		err := conn.Close(websocket.CloseStatus(nil), "Connection closed by client")
-		if err != nil {
-			log.Println(err)
-		}
-		log.Println("Connection closed")
-		delete(rooms[roomId], ses)
-		if len(rooms[roomId]) == 0 {
-			delete(rooms, roomId)
-			log.Println("Room deleted")
-		}
-	}()
-	for {
-		_, msg, err := conn.Read(c)
-		if err != nil {
-			log.Println(err)
-			delete(rooms[roomId], ses)
-			break
-		}
-		if strings.Contains(string(msg), "echo:") {
-			conn.Write(c, websocket.MessageText, []byte("hi 2"))
-		} else {
-			for s := range rooms[roomId] {
-				if s.room == roomId && ses != s {
-					s.conn.Write(c, websocket.MessageText, []byte(string(msg)))
-				}
-			}
-		}
-		log.Println(string(msg))
-	}
+	// ses := session.CreateSession(conn, roomId)
+	// connections := rooms[roomId]
+	// if connections == nil {
+	// 	conn.Write(c, websocket.MessageText, []byte("room not found make shure you have created this room"))
+	// 	conn.Close(websocket.StatusTryAgainLater, "Connection closed by server")
+	// 	log.Println("Connection not found")
+	// 	return
+	// }
+	// connections[ses] = true
+	// defer func() {
+	// 	err := conn.Close(websocket.CloseStatus(nil), "Connection closed by client")
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 	}
+	// 	log.Println("Connection closed")
+	// 	delete(rooms[roomId], ses)
+	// 	if len(rooms[roomId]) == 0 {
+	// 		delete(rooms, roomId)
+	// 		log.Println("Room deleted")
+	// 	}
+	// }()
+	// for {
+	// 	_, msg, err := conn.Read(c)
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 		delete(rooms[roomId], ses)
+	// 		break
+	// 	}
+	// 	if strings.Contains(string(msg), "echo:") {
+	// 		conn.Write(c, websocket.MessageText, []byte("hi 2"))
+	// 	} else {
+	// 		for s := range rooms[roomId] {
+	// 			if s.Room == roomId && ses != s {
+	// 				s.Connection.Write(c, websocket.MessageText, []byte(string(msg)))
+	// 			}
+	// 		}
+	// 	}
+	// 	log.Println(string(msg))
+	// }
 }
