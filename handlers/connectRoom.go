@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/JoaoRafa19/goplaningbackend/session"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,13 +12,14 @@ func ConnectRoom(c *gin.Context) {
 
 	roomId := c.Param("room_id")
 
-	if roomId == "" {
+	if roomId == "" || manager.Rooms[roomId] == nil{
 		c.JSON(http.StatusNotFound, gin.H{"error": "room_id must be passed"})
 	}
 
-	manager := session.CreateManager(roomId)
+	
 
-	manager.ServeWS(c.Writer, c.Request)
+	
+	manager.ServeWS(c, roomId)
 
 	// ses := session.CreateSession(conn, roomId)
 	// connections := rooms[roomId]
