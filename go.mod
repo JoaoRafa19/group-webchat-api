@@ -2,10 +2,7 @@ module github.com/JoaoRafa19/goplaningbackend
 
 go 1.20
 
-require (
-	github.com/gin-gonic/gin v1.9.1
-	nhooyr.io/websocket v1.8.7
-)
+require github.com/gin-gonic/gin v1.9.1
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -16,6 +13,7 @@ require (
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect

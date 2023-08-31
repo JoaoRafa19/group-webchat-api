@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 
 	"github.com/JoaoRafa19/goplaningbackend/events"
 	"github.com/gin-gonic/gin"
-	"nhooyr.io/websocket"
+	"github.com/gorilla/websocket"
 )
-
 
 type Manager struct {
 	Rooms map[string]*Room
@@ -21,37 +21,38 @@ func CreateManager() *Manager {
 	}
 }
 
+var (
+	upgrader = websocket.Upgrader{
+		CheckOrigin: checkOrigin,
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+)
+
 func (m *Manager) ServeWS(context *gin.Context, room string) {
 
 	log.Println("New Connection")
 
-	conn, err := websocket.Accept(context.Writer, context.Request, &websocket.AcceptOptions{
-		InsecureSkipVerify: true,
-		
-	})
-
+	conn, err := upgrader.Upgrade(context.Writer, context.Request, nil)
 
 	if err != nil {
-		conn.Write(context, websocket.MessageText, []byte("connection closing..."))
-		conn.Close(websocket.CloseStatus(err), "Connection closed by server")
+		conn.WriteMessage(websocket.TextMessage, []byte("connection closing..."))
+		conn.Close()
 		log.Println(err)
 		return
 	}
 
-
-
 	client := NewClient(conn, m, room, context)
 	if err := m.addClient(client, room); err != nil {
-		data, _ :=  json.Marshal("{'error': 'invalid_room'}")
+		data, _ := json.Marshal("{'error': 'invalid_room'}")
 		client.SendData(context, &events.Event{
-			Type: "error",
-			Sender: "server",
+			Type:    "error",
+			Sender:  "server",
 			Payload: data,
 		})
-		client.conn.Close(websocket.CloseStatus(err), "Connection closed by server")
+		client.conn.Close()
 		return
 	}
-
 
 	// Start client process
 	go client.ReadMessages(context)
@@ -66,6 +67,17 @@ func (m *Manager) addClient(c *Client, room string) error {
 	}
 	return errors.New("no room ")
 
+}
+
+func checkOrigin(r *http.Request) bool {
+	origin := r.Header.Get("Origin")
+
+	switch origin {
+	case "http://localhost":
+		return true
+	default:
+		return true
+	}
 }
 
 func (m *Manager) RemoveClient(c *Client, room string) {

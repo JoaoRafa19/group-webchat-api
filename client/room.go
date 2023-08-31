@@ -4,9 +4,7 @@ import (
 	"errors"
 	"log"
 	"sync"
-
 	"github.com/JoaoRafa19/goplaningbackend/events"
-	"nhooyr.io/websocket"
 )
 
 type Room struct {
@@ -60,7 +58,7 @@ func (r *Room) RemoveClient(c *Client) {
 	defer r.Unlock()
 
 	if _, ok := r.clients[c]; ok {
-		c.conn.Close(websocket.CloseStatus(websocket.CloseError{Code: websocket.StatusNormalClosure, Reason: "connection closed"}), "connection closed")
+		c.conn.Close()
 		delete(r.clients, c)
 	}
 }
