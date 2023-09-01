@@ -5,25 +5,52 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
-	"github.com/JoaoRafa19/goplaningbackend/events"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 type Manager struct {
 	Rooms map[string]*Room
+	Otps RetentionMap
 }
 
-func CreateManager() *Manager {
+func CreateManager(ctx *gin.Context) *Manager {
 	return &Manager{
 		Rooms: make(map[string]*Room),
+		Otps: NewRetentionMap(ctx, 5 * time.Second),
 	}
+}
+
+func authorize(  ) bool {
+	if req.username == "user" && req.password == "pass" {
+		return true
+	}
+}
+
+
+func (m* Manager) loginHandler (ctx *gin.Context) {
+	type userLoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	var req userLoginRequest
+
+	if err:= json.NewDecoder(ctx.Request.Body).Decode(&req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	
+
+
 }
 
 var (
 	upgrader = websocket.Upgrader{
-		CheckOrigin: checkOrigin,
+		CheckOrigin:     checkOrigin,
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
@@ -45,7 +72,7 @@ func (m *Manager) ServeWS(context *gin.Context, room string) {
 	client := NewClient(conn, m, room, context)
 	if err := m.addClient(client, room); err != nil {
 		data, _ := json.Marshal("{'error': 'invalid_room'}")
-		client.SendData(context, &events.Event{
+		client.SendData(context, &Event{
 			Type:    "error",
 			Sender:  "server",
 			Payload: data,

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"sync"
-	"github.com/JoaoRafa19/goplaningbackend/events"
 )
 
 type Room struct {
@@ -28,12 +27,12 @@ func (r *Room) setUpEventHandlers() {
 	r.handlers[EventSendMessage] = SendMessage
 }
 
-func SendMessage(event events.Event, c *Client) error {
+func SendMessage(event Event, c *Client) error {
 	log.Println(event)
 	return nil
 }
 
-func (r *Room) routeEvent(event events.Event, c *Client) error {
+func (r *Room) routeEvent(event Event, c *Client) error {
 
 	if handler , ok := r.handlers[event.Type]; ok {
 		if err := handler(event, c);  err != nil {

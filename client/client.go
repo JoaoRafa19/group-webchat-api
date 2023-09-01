@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/JoaoRafa19/goplaningbackend/events"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -26,10 +25,10 @@ type Client struct {
 	room     *Room
 
 	// egress to avoid concourence in write messages
-	eggres chan events.Event
+	eggres chan Event
 }
 
-func (c *Client) SendData(ctx *gin.Context, e *events.Event) error {
+func (c *Client) SendData(ctx *gin.Context, e *Event) error {
 
 	userMessage, _ := json.Marshal(e)
 	if ok := c.conn.WriteMessage(websocket.TextMessage, userMessage); ok != nil {
@@ -45,7 +44,7 @@ func NewClient(conn *websocket.Conn, m *Manager, room string, context *gin.Conte
 		manager:  m,
 		room_id:  room,
 		room:     m.Rooms[room],
-		eggres:   make(chan events.Event),
+		eggres:   make(chan Event),
 		clientId: uuid.NewString(),
 	}
 
@@ -60,10 +59,10 @@ func (c *Client) ReadMessages(ctx *gin.Context) {
 		c.manager.RemoveClient(c, c.room_id)
 	}()
 
-	if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-		log.Println(err)
-		return
-	}
+	// if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
 	c.conn.SetReadLimit(1024)
 	// c.conn.SetPongHandler(c.PongHanndler)
 
@@ -77,13 +76,13 @@ func (c *Client) ReadMessages(ctx *gin.Context) {
 			break
 		}
 
-		var request events.Event
+		var request Event
 		if err := json.Unmarshal(payload, &request); err != nil {
 			log.Printf("Error unmashal event: %v", err)
 			break
 		}
 
-		log.Println("Event: %v", request)
+		log.Printf("Event: %v", request)
 
 		if err := c.room.routeEvent(request, c); err != nil {
 			log.Println(err)
@@ -99,6 +98,8 @@ func (c *Client) ReadMessages(ctx *gin.Context) {
 		// log.Println("message ->" + string(payload))
 	}
 }
+
+
 
 func (c *Client) WriteMessages(ctx *gin.Context) {
 	defer func() {
@@ -124,21 +125,22 @@ func (c *Client) WriteMessages(ctx *gin.Context) {
 				return
 			}
 
-			if err := c.conn.WriteMessage( websocket.TextMessage, data); err != nil {
+			if err := c.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Println("Failed to send message", err)
 			}
 			log.Println("message sent")
 
-		// case <-ticker.C:
-		// 	log.Print("Ping")
-		// 	// Send Ping to Client
+			// case <-ticker.C:
+			// 	log.Print("Ping")
+			// 	// Send Ping to Client
 
-		// 	if err := c.conn.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
-		// 		log.Println("Ping error :", err)
-		// 		// return
-		// 	}
-		// }
+			// 	if err := c.conn.WriteMessage(websocket.PingMessage, []byte(``)); err != nil {
+			// 		log.Println("Ping error :", err)
+			// 		// return
+			// 	}
+			
 
+		}
 	}
 }
 
