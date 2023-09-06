@@ -9,9 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	databaseName = "goplaningdb"
-)
+
 
 func getConnection() (client *mongo.Client, ctx context.Context) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))

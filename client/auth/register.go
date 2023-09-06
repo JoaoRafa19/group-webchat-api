@@ -85,18 +85,18 @@ func saveClient(user DatabaseUser) error {
 
 	go func () {
 		
-		user ,err:= database.GetUser(user.Username) 
-		if user != nil && err != nil {
-			
-		}
+		// user ,err:= database.GetUser(user.Username) 
+		// if user != nil && err != nil {
 
-		err := database.Insert("usuarios",user)
-		respch <- Response{
-			value: nil,
-			err: err,
-		}
+		// }
+
+		// err := database.Insert("usuarios",user)
+		// respch <- Response{
+		// 	value: nil,
+		// 	err: err,
+		// }
 	}()
-
+    
 	for  {
 		select{
 		case resp:= <-respch:

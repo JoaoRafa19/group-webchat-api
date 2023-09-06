@@ -12,7 +12,7 @@ func GetUser(username string) ([]byte, error) {
 	client, ctx := getConnection()
 
 	defer client.Disconnect(ctx)
-	c := client.Database("websocket").Collection("users")
+	c := client.Database(databaseName).Collection("users")
 	opts := options.Find()
 	curr, err := c.Find(ctx, bson.D{{Key: "username", Value: username}}, opts)
 
