@@ -9,7 +9,13 @@ import (
 	// "github.com/google/uuid"
 )
 
+
+
 func CreateRooms(c *gin.Context) {
+	if manager == nil {
+		manager = client.CreateManager(c)
+	}
+
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
 

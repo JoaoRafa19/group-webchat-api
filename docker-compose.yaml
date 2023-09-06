@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/usr/src/app
+    command: go run main.go
+  db:
+    image: 'bitnami/mongodb:5.0.17'
+    ports:
+      - '27017:27017'
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+    # environment:
+    #   MONGODB_ROOT_PASSWORD:  root
+    #   MONGODB_REPLICA_SET_MODE: primary
+    #   MONGODB_REPLICA_SET_KEY: 123456
+    #   MONGODB_DATABASE: goplaningdb
+
+volumes:
+  mongodb_data:
+    driver: local

@@ -4,3 +4,6 @@
 /.vscode/
 .vscode/*  
 !.vscode/launch.json
+
+*.crt
+*.key

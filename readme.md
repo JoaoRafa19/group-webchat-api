@@ -1,6 +1,9 @@
 # Websocket chatroom api 
 
+
+
 ## How to use
+
 
 ### 1. Install dependencies
 
@@ -29,3 +32,11 @@ curl -X GET http://localhost:8080/'
 ### 3. Open client
 
 Use a websocket client to connect to `ws://localhost:8080/ws/{room_id}` and send a message to the server. The server will broadcast the message to all connected clients.
+
+## Database
+
+Create mongo
+
+```bash
+    docker run -d --name mongodb -p 27017:27017 mongo
+```

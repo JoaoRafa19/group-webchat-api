@@ -8,6 +8,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+func GetUser(username string) ([]byte, error) {
+	client, ctx := getConnection()
+
+	defer client.Disconnect(ctx)
+	c := client.Database("websocket").Collection("users")
+	opts := options.Find()
+	curr, err := c.Find(ctx, bson.D{{Key: "username", Value: username}}, opts)
+
+	if err != nil {
+		return nil, err
+	} else {
+		var elem []byte
+		err := curr.Decode(elem)
+		if err != nil {
+			fmt.Printf("Erro ao buscar: %v", err)
+			return nil, fmt.Errorf("user_not_found")
+		}
+		return elem, nil
+	}
+}
+
 func Get(collection string) (interface{}, error) {
 	client, ctx := getConnection()
 

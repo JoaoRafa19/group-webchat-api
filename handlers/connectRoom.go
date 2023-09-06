@@ -18,13 +18,10 @@ func ConnectRoom(c *gin.Context) {
 
 	roomId := c.Param("room_id")
 
-	if roomId == "" || manager.Rooms[roomId] == nil{
+	if roomId == "" || manager.Rooms[roomId] == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "room_id must be passed"})
 	}
 
-	
-
-	
 	manager.ServeWS(c, roomId)
 
 	// ses := session.CreateSession(conn, roomId)

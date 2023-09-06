@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log"
 
 	"github.com/JoaoRafa19/goplaningbackend/client"
 	"github.com/gin-gonic/gin"
@@ -10,13 +11,12 @@ import (
 	"github.com/swaggo/swag/example/basic/docs"
 )
 
-var manager * client.Manager
+var manager *client.Manager
 
 func Serve() {
 
 	// Initialize router
 	router := gin.Default()
-
 
 	basePath := "/"
 	docs.SwaggerInfo.BasePath = basePath
@@ -25,6 +25,10 @@ func Serve() {
 	{
 		// Opening routes
 		v1.GET("/", CreateRooms)
+
+		v1.POST("/register", RegisterHandler)
+
+		v1.POST("/login", LoginHandler)
 
 		v1.GET("/clients", GetClients)
 
@@ -35,7 +39,15 @@ func Serve() {
 	})
 	// Init Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swagfiles.Handler))
+	
 
-	// Run the server
-	router.Run(":8080") // listen and serve at localhost:8080
+	if err := router.Run(":8080"); err != nil {
+		log.Fatal("Listen error", err)
+	}
+
+	// Run the server with TLS
+	// err := router.RunTLS(":8080", "server.crt", "server.key") // listen and serve at localhost:8080
+	// if err != nil {
+	// 	log.Fatal("ListenAndServe: ", err)
+	// }
 }
