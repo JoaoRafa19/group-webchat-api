@@ -12,12 +12,15 @@ func GetUser(username string) ([]byte, error) {
 	client, ctx := getConnection()
 
 	defer client.Disconnect(ctx)
-	c := client.Database(databaseName).Collection("users")
+	c := client.Database(databaseName).Collection(UsersCollection)
 	opts := options.Find()
 	curr, err := c.Find(ctx, bson.D{{Key: "username", Value: username}}, opts)
 
-	if err != nil {
+	if err != nil  {
 		return nil, err
+	}
+	if err == nil && curr == nil {
+		return nil, fmt.Errorf("user_not_found")
 	} else {
 		var elem []byte
 		err := curr.Decode(elem)
@@ -34,7 +37,7 @@ func Get(collection string) (interface{}, error) {
 
 	defer client.Disconnect(ctx)
 
-	c := client.Database("websocket").Collection(collection)
+	c := client.Database(databaseName).Collection(collection)
 	opts := options.Find().SetLimit(6)
 	curr, err := c.Find(
 		context.TODO(),

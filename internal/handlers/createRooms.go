@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/JoaoRafa19/goplaningbackend/client"
+	"github.com/JoaoRafa19/goplaningbackend/internal/client"
 	"github.com/gin-gonic/gin"
 	// "github.com/google/uuid"
 )

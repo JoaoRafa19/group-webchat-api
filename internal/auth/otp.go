@@ -1,10 +1,8 @@
-package client
+package auth
 
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type OTP struct {
@@ -21,14 +19,14 @@ func NewRetentionMap(ctx context.Context, retentionPeriod time.Duration) Retenti
 	return rm
 }
 
-func (rm RetentionMap) NewOTP () OTP {
+func (rm RetentionMap) NewOTP (otp string) error {
 	o:= OTP {
-		Key: uuid.NewString(),
+		Key: otp,
 		Created: time.Now(),
 	}
 
 	rm[o.Key] = o 
-	return o
+	return nil
 }
 
 

@@ -1,69 +1,28 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/JoaoRafa19/goplaningbackend/internal/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 type Manager struct {
 	Rooms map[string]*Room
-	Otps  RetentionMap
+	Otps  auth.RetentionMap
 }
 
-func CreateManager(ctx *gin.Context) *Manager {
+func CreateManager(ctx context.Context) *Manager {
 	return &Manager{
 		Rooms: make(map[string]*Room),
-		Otps:  NewRetentionMap(ctx, 50*time.Second),
+		Otps:  auth.NewRetentionMap(ctx, 50*time.Second),
 	}
-
-}
-
-/*
-*
-
-1- A regular HTTP request to Authenticate returns an OneTimePassword (OTP) which can be used to connect to a WebSocket connection.
-
-2- Connect WebSocket, but don’t accept any messages until a special Authentication message with credentials has been sent.
-*/
-func authorize(username, password string) bool {
-
-
-
-	//The user authenticates using regular HTTP, an OTP ticket is returned to the user.
-	if username == "usr" && password == "pass" {
-		return true
-	}
-	return false
-}
-
-func (m *Manager) LoginHandler(ctx *gin.Context) {
-
-	type userLoginRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
-	var req userLoginRequest
-
-	if err := json.NewDecoder(ctx.Request.Body).Decode(&req); err != nil {
-		ctx.Error(err)
-		return
-	}
-
-	if authorize(req.Username, req.Password) {
-		otp:= m.Otps.NewOTP()
-		ctx.JSON(200, gin.H{
-			"otp": otp.Key,
-		})
-		return
-	}
-	ctx.AbortWithStatus(http.StatusUnauthorized)
 
 }
 
@@ -77,26 +36,21 @@ var (
 
 func (m *Manager) ServeWS(context *gin.Context, room string) {
 
-
 	//handle authorization
 
-	otp:=	context.Query("otp")
+	otp := context.Query("otp")
 
-	if otp == ""{
+	if otp == "" {
 		context.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
 
 	if !m.Otps.VerifyOTP(otp) {
 		context.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	
+
 	log.Println("New Connection")
-
-
-
 
 	conn, err := upgrader.Upgrade(context.Writer, context.Request, nil)
 

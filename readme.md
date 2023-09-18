@@ -35,7 +35,7 @@ Use a websocket client to connect to `ws://localhost:8080/ws/{room_id}` and send
 
 ## Database
 
-Create mongo
+Create mongo database
 
 ```bash
     docker run -d --name mongodb -p 27017:27017 mongo

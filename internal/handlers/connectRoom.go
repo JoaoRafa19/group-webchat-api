@@ -2,16 +2,12 @@ package handlers
 
 import (
 	"net/http"
-
-	"github.com/JoaoRafa19/goplaningbackend/client"
 	"github.com/gin-gonic/gin"
 )
 
 func ConnectRoom(c *gin.Context) {
 
-	if manager == nil {
-		manager = client.CreateManager(c)
-	}
+	
 
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")

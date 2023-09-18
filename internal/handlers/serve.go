@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"log"
 
-	"github.com/JoaoRafa19/goplaningbackend/client"
+	"github.com/JoaoRafa19/goplaningbackend/internal/client"
 	"github.com/gin-gonic/gin"
 	swagfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,6 +18,8 @@ func Serve() {
 
 	// Initialize router
 	router := gin.Default()
+
+	manager = client.CreateManager(context.Background() )
 
 	basePath := "/"
 	docs.SwaggerInfo.BasePath = basePath
